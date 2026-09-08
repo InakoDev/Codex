@@ -17,6 +17,7 @@ pub fn run() {
             #[cfg(target_os = "linux")]
             {
                 // Tauri's window decoration sucks by default, this fixes it. No touchy.
+                // Unsure of the affects this has on other distributions, might need to implement a check.
                 use gtk::prelude::GtkWindowExt;
                 let window: WebviewWindow = app
                     .get_webview_window("main")

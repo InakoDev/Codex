@@ -1,22 +1,18 @@
-import "./App.css";
+import "./styles/catppuccin.css";
+import "./styles/themes/dark.css";
+import "./styles/main.css";
 
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useEffect } from "react";
+import Sidebar from "./components/Sidebar.jsx";
 
 function App() {
     const appWindow = getCurrentWindow();
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            console.log(`width: ${window.innerWidth}px, height: ${window.innerHeight}px`);
-        }, 500);
-
-        return () => clearInterval(interval);
-    }, []);
-
     return (
         <main className="container">
-            <h1>Welcome to Tauri + React</h1>
+            <Sidebar activeTab="lessons" />
+            {/*<h1>Welcome to Tauri + React</h1>*/}
         </main>
     );
 }

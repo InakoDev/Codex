@@ -1,0 +1,11 @@
+:root {
+    /* Main */
+    --background: var(--base);
+    --font-color: var(--text);
+
+    /* Sidebar */
+    --panel: var(--mantle);
+    --panel-border: var(--crust);
+    --panel-btn: var(--surface0);
+    --panel-btn-raised: var(--surface1);
+}
