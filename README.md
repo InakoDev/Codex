@@ -1,7 +1,11 @@
-# Tauri + React + Typescript
+# Codex
 
-This template should help get you started developing with Tauri, React and Typescript in Vite.
+**An interactive learning environment powered by LLMs.**
 
-## Recommended IDE Setup
+Start with a question, a curious thought, or something you've always wanted to understand. Codex will turn that into the
+beginning of a new learning journey.
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+It creates lessons for you, keeps track of your progress, and helps guide you toward your next goal.<br>
+Along the way, you can see ideas come to life through graphs, flow charts, diagrams, and playful visualisations.
+
+*Less vibecoding, more learning.*
