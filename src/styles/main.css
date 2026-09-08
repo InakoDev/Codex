@@ -1,5 +1,6 @@
 @font-face {
     font-family: "Geist";
+    /* noinspection CssUnknownTarget */
     src: url("/fonts/Geist-VariableFont_wght.ttf") format("truetype");
     font-weight: 100 900;
     font-style: normal;
@@ -71,8 +72,6 @@ button {
 .sidebar-nav .btn {
     text-align: left;
     padding: 7px 8px;
-    /*color: var(--ink-dim);*/
-    /*font-size: 13px;*/
     background: var(--panel-btn);
     transition: background 0.12s ease, color 0.12s ease;
 }
