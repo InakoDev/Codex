@@ -18,7 +18,10 @@ pub fn run() {
             {
                 // Tauri's window decoration sucks by default, this fixes it. No touchy.
                 use gtk::prelude::GtkWindowExt;
-                let window: WebviewWindow = app.get_webview_window("main").ok_or("'main' WebviewWindow not found.")?;
+                let window: WebviewWindow = app
+                    .get_webview_window("main")
+                    .ok_or("'main' WebviewWindow not found.")?;
+
                 let gtk_window: ApplicationWindow = window.gtk_window()?;
                 gtk_window.set_titlebar(Option::<&gtk::Widget>::None);
             }
