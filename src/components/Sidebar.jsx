@@ -1,6 +1,6 @@
 const NAVIGATION_ITEMS = [
+    { id: "chat", label: "Chat" },
     { id: "lessons", label: "Lessons" },
-    { id: "chat", label: "Meow" },
     { id: "progress", label: "Progress" },
 ];
 
