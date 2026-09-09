@@ -66,20 +66,39 @@ button {
 .sidebar-nav {
     display: flex;
     flex-direction: column;
-    gap: 1px;
+    gap: 4px;
 }
 
 .sidebar-nav .btn {
     text-align: left;
-    padding: 7px 8px;
-    background: var(--panel-btn);
-    transition: background 0.12s ease, color 0.12s ease;
+    padding: 7px 14px;
+    background: transparent /*var(--panel-btn)*/;
+    border-radius: 4px;
+    transition: background 0.12s ease, transform 0.0267s ease-out;
 }
 
 .sidebar-nav .btn:hover {
-    background: var(--panel-btn-raised);
+    background: var(--panel-btn-raised) !important;
 }
 
 .sidebar-nav .btn.active {
-    background: var(--panel-btn-raised);
+    transform: scale(1);
+    background: var(--panel-btn);
+    border-radius: 0 4px 4px 0;
+}
+
+.sidebar-nav .btn:active {
+    filter: brightness(0.85);
+    transform: scale(0.98);
+}
+
+.sidebar-nav .btn.active::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    border-radius: 8px 0 0 8px; /* Doubled radius so it looks the same as 4px due to sizing. */
+    background: var(--panel-btn-accent);
 }
