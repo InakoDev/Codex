@@ -10,6 +10,6 @@ Along the way, you can see ideas come to life through graphs, flow charts, diagr
 
 *Less vibecoding, more learning.*
 
-# Showcase
+## Showcase
 
 <img src="docs/assets/welcome_screen.png" alt="Welcome screen showcase" width="800">
