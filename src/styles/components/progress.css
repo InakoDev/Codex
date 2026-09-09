@@ -1,0 +1,88 @@
+.progress-tab {
+    flex: 1;
+    padding: 28px 32px;
+    overflow-y: auto;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.progress-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.stat-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px 18px;
+    background: var(--panel-btn);
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+}
+
+.stat-value {
+    font-size: var(--text-xl);
+    font-weight: 500;
+}
+
+.stat-label {
+    color: var(--font-color-muted);
+    font-size: var(--text-sm);
+}
+
+.progress-journeys h2 {
+    font-size: var(--text-md);
+    font-weight: 500;
+    margin: 0 0 14px;
+}
+
+.progress-journeys ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.journey-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.journey-info {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+}
+
+.journey-label {
+    font-size: var(--text-base);
+    font-weight: 500;
+}
+
+.journey-percent {
+    color: var(--font-color-muted);
+    font-size: var(--text-sm);
+}
+
+.journey-track {
+    display: flex;
+    gap: 5px;
+}
+
+.journey-step {
+    flex: 1;
+    height: 5px;
+    border-radius: 999px;
+    background: var(--divider);
+}
+
+.journey-step.done {
+    background: var(--positive);
+}

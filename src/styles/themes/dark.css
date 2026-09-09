@@ -2,6 +2,8 @@
     /* Main */
     --background: var(--base);
     --font-color: var(--text);
+    --font-color-muted: var(--subtext);
+    --font-color-faint: var(--overlay);
 
     /* Sidebar */
     --panel: var(--mantle);
@@ -9,4 +11,13 @@
     --panel-btn: var(--surface0);
     --panel-btn-raised: var(--surface1);
     --panel-btn-accent: var(--mauve);
+
+    --accent: var(--mauve);
+    --accent-soft: rgba(203, 166, 247, 0.14);
+    --accent-strong: #cba6f7;
+    --positive: var(--green);
+    --positive-soft: rgba(166, 227, 161, 0.16);
+
+    /* Shared surfaces */
+    --divider: var(--surface0);
 }

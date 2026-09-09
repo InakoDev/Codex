@@ -1,24 +1,37 @@
+import { BookIcon, ChatIcon, LessonsIcon, ProgressIcon } from "./Icons.jsx";
+
 const NAVIGATION_ITEMS = [
-    { id: "chat", label: "Chat" },
-    { id: "lessons", label: "Lessons" },
-    { id: "progress", label: "Progress" },
+    { id: "chat", label: "Chat", icon: ChatIcon },
+    { id: "lessons", label: "Lessons", icon: LessonsIcon },
+    { id: "progress", label: "Progress", icon: ProgressIcon },
 ];
 
-function Sidebar({ activeTab, onTabChange }) {
+function Sidebar({ activeTab, onTabChange, onLogoClick }) {
     return (
         <aside className="sidebar">
-            <span className="title">Codex</span>
+            <button className="brand" onClick={onLogoClick} type="button">
+                <span className="brand-mark" aria-hidden="true">
+                    <BookIcon />
+                </span>
+                <span className="brand-name">Codex</span>
+            </button>
 
             <nav className="sidebar-nav">
-                {NAVIGATION_ITEMS.map((item) => (
-                    <button
-                        key={item.id}
-                        className={`btn ${activeTab === item.id ? "active" : ""}`}
-                        onClick={() => onTabChange(item.id)}
-                    >
-                        {item.label}
-                    </button>
-                ))}
+                {NAVIGATION_ITEMS.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = activeTab === item.id;
+                    return (
+                        <button
+                            key={item.id}
+                            className={`btn ${isActive ? "active" : ""}`}
+                            onClick={() => onTabChange(item.id)}
+                            aria-current={isActive ? "page" : undefined}
+                        >
+                            <Icon className="btn-icon" />
+                            <span>{item.label}</span>
+                        </button>
+                    );
+                })}
             </nav>
         </aside>
     );
