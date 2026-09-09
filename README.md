@@ -9,3 +9,7 @@ It creates lessons for you, keeps track of your progress, and helps guide you to
 Along the way, you can see ideas come to life through graphs, flow charts, diagrams, and playful visualisations.
 
 *Less vibecoding, more learning.*
+
+# Showcase
+
+<img src="docs/assets/welcome_screen.png" alt="Welcome screen showcase" width="800">
