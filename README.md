@@ -12,4 +12,7 @@ Along the way, you can see ideas come to life through graphs, flow charts, diagr
 
 ## Showcase
 
+> [!WARNING]
+> No functionality is implemented yet, this is just a showcase of what it currently looks like.
+
 <img src="docs/assets/welcome_screen.png" alt="Welcome screen showcase" width="800">
