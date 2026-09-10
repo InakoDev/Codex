@@ -1,0 +1,16 @@
+title = "Variables & Mutability"
+
+[[panels]]
+side = "left"
+type = "markdown"
+path = "variables.md"
+
+[[panels]]
+side = "right"
+type = "code_exercise"
+prompt = "Declare a mutable variable, print it, then reassign and print again."
+language = "rust"
+starter_path = "starter.rs"
+validation = { type = "stdout_match", expected_path = "expected_stdout.txt" }
+controls = ["validate", "reset"]
+required = true

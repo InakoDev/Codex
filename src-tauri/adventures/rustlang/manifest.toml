@@ -1,0 +1,11 @@
+id = "rustlang"
+title = "The Rust Programming Language"
+version = "0.1.0"
+
+[[steps]]
+id = "intro"
+path = "lessons/ch1/01-introduction/" # Automatically pulls manifest.toml
+
+[[steps]]
+id = "variables"
+path = "lessons/ch1/02-variables/"

@@ -1,0 +1,6 @@
+title = "Introduction"
+
+[[panels]]
+side = "full"
+type = "markdown"
+path = "introduction.md" # Pulls from root directory of lesson.
