@@ -63,3 +63,18 @@ export function ArrowIcon(props) {
         </svg>
     );
 }
+
+export function SettingsIcon(props) {
+    return (
+        <svg viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+            <path
+                d="M7.253 3.102a1.755 1.755 0 0 1 3.494 0 1.755 1.755 0 0 0 2.489 1.436 1.755 1.755 0 0 1 1.747 3.025 1.755 1.755 0 0 0 0 2.874 1.755 1.755 0 0 1-1.747 3.025 1.755 1.755 0 0 0-2.489 1.436 1.755 1.755 0 0 1-3.494 0 1.755 1.755 0 0 0-2.49-1.436 1.755 1.755 0 0 1-1.747-3.025 1.755 1.755 0 0 0 0-2.874 1.755 1.755 0 0 1 1.747-3.025 1.755 1.755 0 0 0 2.49-1.436Z"
+                stroke="currentColor"
+                strokeWidth="1.3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+            <circle cx="9" cy="9" r="2.25" stroke="currentColor" strokeWidth="1.3" />
+        </svg>
+    );
+}

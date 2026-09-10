@@ -1,4 +1,4 @@
-import { BookIcon, ChatIcon, LessonsIcon, ProgressIcon } from "./Icons.jsx";
+import { BookIcon, ChatIcon, LessonsIcon, ProgressIcon, SettingsIcon } from "./Icons.jsx";
 
 const NAVIGATION_ITEMS = [
     { id: "chat", label: "Chat", icon: ChatIcon },
@@ -16,7 +16,7 @@ function Sidebar({ activeTab, onTabChange, onLogoClick }) {
                 <span className="brand-name">Codex</span>
             </button>
 
-            <nav className="sidebar-nav">
+            <nav className="nav">
                 {NAVIGATION_ITEMS.map((item) => {
                     const Icon = item.icon;
                     const isActive = activeTab === item.id;
@@ -33,6 +33,16 @@ function Sidebar({ activeTab, onTabChange, onLogoClick }) {
                     );
                 })}
             </nav>
+
+            <div className="nav footer">
+                <button
+                    className={`btn ${activeTab === "settings" ? "active" : ""}`}
+                    onClick={() => onTabChange("settings")}
+                >
+                    <SettingsIcon className="btn-icon" />
+                    <span>Settings</span>
+                </button>
+            </div>
         </aside>
     );
 }

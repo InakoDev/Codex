@@ -40,13 +40,14 @@
     letter-spacing: 0.2px;
 }
 
-.sidebar-nav {
+.sidebar .nav {
     display: flex;
     flex-direction: column;
     gap: 4px;
 }
 
-.sidebar-nav .btn {
+.sidebar .nav .btn,
+.sidebar-footer .btn {
     display: flex;
     align-items: center;
     gap: 9px;
@@ -59,31 +60,31 @@
     transition: background 0.12s ease, transform 0.0267s ease-out, color 0.12s ease;
 }
 
-.sidebar-nav .btn-icon {
+.sidebar .nav .btn-icon {
     width: 15px;
     height: 15px;
     flex-shrink: 0;
     opacity: 0.85;
 }
 
-.sidebar-nav .btn:hover {
+.sidebar .nav .btn:hover {
     background: var(--panel-btn-raised) !important;
     color: var(--font-color);
 }
 
-.sidebar-nav .btn.active {
+.sidebar .nav .btn.active {
     transform: scale(1);
     background: var(--panel-btn);
     border-radius: 0 4px 4px 0;
     color: var(--font-color);
 }
 
-.sidebar-nav .btn:active {
+.sidebar .nav .btn:active {
     filter: brightness(0.85);
     transform: scale(0.98);
 }
 
-.sidebar-nav .btn.active::before {
+.sidebar .nav .btn.active::before {
     content: "";
     position: absolute;
     left: 0;
@@ -92,4 +93,9 @@
     width: 4px;
     border-radius: 8px 0 0 8px; /* Doubled radius so it looks the same as 4px due to sizing. */
     background: var(--panel-btn-accent);
+}
+
+.sidebar .footer {
+    margin-top: auto;
+    /*border-top: 1px solid var(--panel-border);*/
 }

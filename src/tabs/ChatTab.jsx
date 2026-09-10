@@ -19,8 +19,7 @@ function buildOpeningExchange(query) {
             id: createId(),
             role: "diagram",
             label: "Roadmap",
-            caption:
-                "A rough map of how the pieces connect. Real diagrams will render here once everything is wired up.",
+            caption: "Real diagrams will render here once everything is wired up.",
         },
         {
             id: createId(),
