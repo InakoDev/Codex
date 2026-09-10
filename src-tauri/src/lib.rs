@@ -1,3 +1,5 @@
+mod course;
+
 use gtk::ApplicationWindow;
 use tauri::{Manager, WebviewWindow};
 
