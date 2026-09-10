@@ -46,8 +46,7 @@
     gap: 4px;
 }
 
-.sidebar .nav .btn,
-.sidebar-footer .btn {
+.sidebar .nav .btn {
     display: flex;
     align-items: center;
     gap: 9px;
