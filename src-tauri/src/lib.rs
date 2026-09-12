@@ -4,6 +4,7 @@ mod entities;
 mod installer;
 mod manifest;
 mod migrations;
+mod progress;
 
 use tauri::{Manager, WebviewWindow};
 
