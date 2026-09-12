@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::path::PathBuf;
 use serde::Deserialize;
 
@@ -14,6 +15,26 @@ pub struct Course {
 pub struct LessonRef {
     pub id: String,
     pub path: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct CourseMigrations {
+    #[serde(rename = "migration", default)]
+    pub migrations: Vec<VersionMigration>,
+}
+
+impl CourseMigrations {
+    pub fn find_for_version(&self, from_version: &str) -> Option<&VersionMigration> {
+        self.migrations.iter().find(|m| m.from_version == from_version)
+    }
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct VersionMigration {
+    pub from_version: String,
+
+    #[serde(default, rename = "lessons")]
+    pub lesson_id_map: HashMap<String, String>
 }
 
 #[derive(Debug, Deserialize)]
