@@ -3,27 +3,29 @@ mod installer;
 mod manifest;
 mod commands;
 
-use gtk::ApplicationWindow;
 use tauri::{Manager, WebviewWindow};
 use crate::commands::AppState;
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-// #[tauri::command]
-// fn greet(name: &str) -> String {
-//     format!("Hello, {}! You've been greeted from Rust!", name)
-// }
 
 pub fn run() {
     // Tauri doesn't support Wayland properly due to problems upstream, this will allow it to run on Wayland.
-    std::env::set_var("__GL_THREADED_OPTIMIZATIONS", "0");
+    std::env::set_var("__GL_THREADED_OPTIMIZATIONS", "1");
     std::env::set_var("__NV_DISABLE_EXPLICIT_SYNC", "1");
 
     tauri::Builder::default()
         .setup(|app| {
             #[cfg(target_os = "linux")]
             {
-                // Tauri's window decoration sucks by default, this fixes it. No touchy.
+                // Tauri's window decoration sucks by default, this fixes it.
                 // Unsure of the affects this has on other distributions, might need to implement a check.
+                // Seems to have a performance impact for loading the window contents.
+
+                // TODO: Upgrade Tauri to '>2.11.x' for Tao 0.36.
+                //  This should fix the problem without needing this.
+                //  Although testing dev branch, it's slow just like doing this.
+
                 use gtk::prelude::GtkWindowExt;
+                use gtk::ApplicationWindow;
+
                 let window: WebviewWindow = app
                     .get_webview_window("main")
                     .ok_or("'main' WebviewWindow not found.")?;
