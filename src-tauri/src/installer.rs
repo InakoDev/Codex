@@ -1,7 +1,7 @@
 use serde::Serialize;
 use std::path::{Path, PathBuf};
 
-use crate::manifest::{Course, CourseError};
+use crate::manifest::{Course, CourseError, CourseMigrations};
 
 #[derive(Debug, thiserror::Error)]
 pub enum InstallerError {
@@ -58,6 +58,25 @@ fn read_course_manifest(course_dir: &Path) -> Result<Course, InstallerError> {
     Ok(course)
 }
 
+pub fn read_course_migrations(course_dir: &Path) -> Result<Option<CourseMigrations>, InstallerError> {
+    let migrations_path = course_dir.join("migrations.toml");
+
+    if !migrations_path.exists() {
+        return Ok(None);
+    }
+
+    let raw = std::fs::read_to_string(&migrations_path).map_err(|err| io_err(&migrations_path, err))?;
+
+    let migrations: CourseMigrations = toml::from_str(&raw).map_err(|source| {
+        InstallerError::Course(CourseError::TOML {
+            path: migrations_path.clone(),
+            source
+        })
+    })?;
+
+    Ok(Some(migrations))
+}
+
 fn list_course_dirs(courses_root: &Path) -> Result<Vec<PathBuf>, InstallerError> {
     if !courses_root.is_dir() {
         return Ok(vec![]);
@@ -102,7 +121,7 @@ pub fn ensure_all_installed(
     resource_dir: &Path,
     app_data_dir: &Path,
 ) -> Result<(), InstallerError> {
-    let resource_root: PathBuf = resource_dir.join("courses");
+    let resource_root: PathBuf = resource_courses_dir(resource_dir);
 
     if !resource_root.is_dir() {
         return Err(InstallerError::MissingResourceDirectory(resource_root));
@@ -110,7 +129,7 @@ pub fn ensure_all_installed(
 
     for course_dir in list_course_dirs(&resource_root)? {
         let course: Course = read_course_manifest(&course_dir)?;
-        let installed_dir = app_data_dir.join("courses").join(&course.id);
+        let installed_dir = data_courses_dir(app_data_dir).join(&course.id);
 
         if !installed_dir.join("manifest.toml").is_file() {
             println!("Installing course '{}'...", course.id);
@@ -126,15 +145,23 @@ pub fn install_course(
     app_data_dir: &Path,
     course_id: &str,
 ) -> Result<Course, InstallerError> {
-    let src: PathBuf = resource_dir.join("courses");
+    let src: PathBuf = resource_courses_dir(resource_dir).join(course_id);
 
     if !src.is_dir() {
         return Err(InstallerError::MissingResourceDirectory(src));
     }
 
-    let dst: PathBuf = app_data_dir.join("courses").join(course_id);
+    let dst: PathBuf = data_courses_dir(app_data_dir).join(course_id);
     remove_dir_if_exists(&dst)?;
     copy_dir_recursive(&src, &dst)?;
 
     read_course_manifest(&dst)
+}
+
+pub fn resource_courses_dir(resource_dir: &Path) -> PathBuf {
+    resource_dir.join("courses")
+}
+
+pub fn data_courses_dir(app_data_dir: &Path) -> PathBuf {
+    app_data_dir.join("courses")
 }
