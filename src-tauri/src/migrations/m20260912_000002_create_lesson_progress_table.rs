@@ -8,7 +8,7 @@ impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         // Just one row per completed lesson. That's it.
         // The statistics for courses started, lessons completed, days learning,
-        // and a calendar view are just different ways of counting.grouping this table.
+        // and a calendar view are just different ways of counting/grouping this table.
 
         manager
             .create_table(
