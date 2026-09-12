@@ -1,0 +1,6 @@
+[[migration]]
+from_version = "0.1.0"
+
+[migration.lesson]
+"intro" = "getting-started"
+"variables" = "variables-and-mutability"
