@@ -166,55 +166,31 @@ pub fn install_course(resource_dir: &Path, app_data_dir: &Path, course_id: &str)
     read_course_manifest(&dst)
 }
 
-pub async fn reconcile_course(
+pub async fn sync_course_state(
     db: &DatabaseConnection,
-    resource_dir: &Path,
-    app_data_dir: &Path,
-    course_id: &str,
-) -> Result<ReconcileResult, InstallerError> {
-    let bundled = read_course_manifest(&resource_courses_dir(resource_dir).join(course_id))?;
+    course: &Course,
+    migrations: Option<&CourseMigrations>,
+) -> Result<(), InstallerError> {
+    let previous_record = CourseEntity::find_by_id(course.id.clone()).one(db).await?;
+    let previous_version: Option<String> = previous_record.as_ref().map(|record| record.version.clone());
 
-    let installed_dir = data_courses_dir(app_data_dir).join(course_id);
-    let folder_present = installed_dir.join("manifest.toml").is_file();
-
-    let previous_record = CourseEntity::find_by_id(course_id.to_string()).one(db).await?;
-    let needs_reconcile = !folder_present;
-
-    if !needs_reconcile {
-        return Ok(ReconcileResult {
-            id: bundled.id,
-            title: bundled.title,
-            version: bundled.version,
-            changed: false,
-        });
-    }
-
-    // TODO: Make code re-usable, it's same as `commands::update_course`.
-    let previous_version = previous_record.as_ref().map(|record| record.version.clone());
-
-    let migrations = read_course_migrations(&resource_courses_dir(resource_dir).join(course_id))?;
-
-    let course = install_course(resource_dir, app_data_dir, course_id)?;
-
-    // Migrate course.
     if let Some(old_version) = previous_version {
         let new_lesson_ids: Vec<String> = course.lessons.iter().map(|lesson| lesson.id.clone()).collect();
-        let migration = migrations
-            .as_ref()
-            .and_then(|migration| migration.find_for_version(&old_version));
+        let migration = migrations.and_then(|migrations| migrations.find_for_version(&old_version));
 
         progress::migrate_course_progress(db, &course.id, migration, &new_lesson_ids).await?;
     }
 
-    // Updating course status.
     let now = Utc::now();
 
     match previous_record {
         Some(record) => {
             let mut active: course::ActiveModel = record.into();
+
             active.title = Set(course.title.clone());
             active.version = Set(course.version.clone());
             active.updated_at = Set(now);
+
             active.update(db).await?;
         }
         None => {
@@ -229,6 +205,35 @@ pub async fn reconcile_course(
             active.insert(db).await?;
         }
     }
+
+    Ok(())
+}
+
+pub async fn reconcile_course(
+    db: &DatabaseConnection,
+    resource_dir: &Path,
+    app_data_dir: &Path,
+    course_id: &str,
+) -> Result<ReconcileResult, InstallerError> {
+    let bundled = read_course_manifest(&resource_courses_dir(resource_dir).join(course_id))?;
+
+    let installed_dir = data_courses_dir(app_data_dir).join(course_id);
+    let folder_present = installed_dir.join("manifest.toml").is_file();
+    let needs_reconcile = !folder_present;
+
+    if !needs_reconcile {
+        return Ok(ReconcileResult {
+            id: bundled.id,
+            title: bundled.title,
+            version: bundled.version,
+            changed: false,
+        });
+    }
+
+    let migrations = read_course_migrations(&resource_courses_dir(resource_dir).join(course_id))?;
+    let course: Course = install_course(resource_dir, app_data_dir, course_id)?;
+
+    sync_course_state(db, &course, migrations.as_ref()).await?;
 
     Ok(ReconcileResult {
         id: course.id,

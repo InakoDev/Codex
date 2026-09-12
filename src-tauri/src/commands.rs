@@ -1,10 +1,7 @@
-use crate::entities::course::Model;
-use crate::entities::{course, CourseEntity};
+use crate::entities::CourseEntity;
 use crate::installer::{self, CourseStatus};
 use crate::manifest::Course;
-use crate::progress;
-use chrono::Utc;
-use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, Set};
+use sea_orm::{DatabaseConnection, EntityTrait};
 use std::path::PathBuf;
 use tauri::{AppHandle, Manager, State};
 
@@ -33,13 +30,6 @@ pub async fn update_course(
     let resource_dir: PathBuf = resource_dir(&app)?;
     let data_dir: PathBuf = app_data_dir(&app)?;
 
-    let previous_record: Option<Model> = CourseEntity::find_by_id(course_id.clone())
-        .one(&state.db)
-        .await
-        .map_err(|err| err.to_string())?;
-
-    let previous_version: Option<String> = previous_record.as_ref().map(|record| record.version.clone());
-
     let migrations =
         installer::read_course_migrations(&installer::resource_courses_dir(&resource_dir).join(&course_id))
             .map_err(|err| err.to_string())?;
@@ -47,41 +37,9 @@ pub async fn update_course(
     let course: Course =
         installer::install_course(&resource_dir, &data_dir, &course_id).map_err(|err| err.to_string())?;
 
-    // Migrate course.
-    if let Some(old_version) = previous_version {
-        let new_lesson_ids: Vec<String> = course.lessons.iter().map(|lesson| lesson.id.clone()).collect();
-        let migration = migrations
-            .as_ref()
-            .and_then(|migration| migration.find_for_version(&old_version));
-
-        progress::migrate_course_progress(&state.db, &course.id, migration, &new_lesson_ids)
-            .await
-            .map_err(|err| err.to_string())?;
-    }
-
-    // Updating course status.
-    let now = Utc::now();
-
-    match previous_record {
-        Some(record) => {
-            let mut active: course::ActiveModel = record.into();
-            active.title = Set(course.title.clone());
-            active.version = Set(course.version.clone());
-            active.updated_at = Set(now);
-            active.update(&state.db).await.map_err(|err| err.to_string())?;
-        }
-        None => {
-            let active = course::ActiveModel {
-                id: Set(course.id.clone()),
-                title: Set(course.title.clone()),
-                version: Set(course.version.clone()),
-                installed_at: Set(now),
-                updated_at: Set(now),
-            };
-
-            active.insert(&state.db).await.map_err(|e| e.to_string())?;
-        }
-    }
+    installer::sync_course_state(&state.db, &course, migrations.as_ref())
+        .await
+        .map_err(|err| err.to_string())?;
 
     Ok(CourseStatus {
         id: course.id,
