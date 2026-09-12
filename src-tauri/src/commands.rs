@@ -47,6 +47,7 @@ pub async fn update_course(
     let course: Course =
         installer::install_course(&resource_dir, &data_dir, &course_id).map_err(|err| err.to_string())?;
 
+    // Migrate course.
     if let Some(old_version) = previous_version {
         let new_lesson_ids: Vec<String> = course.lessons.iter().map(|lesson| lesson.id.clone()).collect();
         let migration = migrations
@@ -114,14 +115,13 @@ pub async fn check_courses(app: AppHandle, state: State<'_, AppState>) -> Result
                     title: course.title,
                     resource_version: course.version,
                     installed_version: record.version,
-                    needs_update
+                    needs_update,
                 })
             }
 
             None => {
-                println!("Course {} not found", course.id);
-                // TODO: Check whether this is a possible state to get into.
-                //  If it is then, I guess install the course and add to db.
+                assert!(false, "Course not found, illegal state?");
+                // I think this is an impossible state now.
             }
         }
     }
@@ -131,7 +131,8 @@ pub async fn check_courses(app: AppHandle, state: State<'_, AppState>) -> Result
 
 fn is_newer(resource_version: &str, installed_version: &str) -> bool {
     let parse = |version: &str| -> Vec<u64> {
-        version.split('.')
+        version
+            .split('.')
             .map(|segment| segment.parse::<u64>().unwrap_or(0))
             .collect()
     };

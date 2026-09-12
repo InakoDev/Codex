@@ -1,7 +1,10 @@
+use crate::entities::{course, CourseEntity};
+use crate::manifest::{Course, CourseError, CourseMigrations};
+use crate::progress;
+use chrono::Utc;
+use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, Set};
 use serde::Serialize;
 use std::path::{Path, PathBuf};
-
-use crate::manifest::{Course, CourseError, CourseMigrations};
 
 #[derive(Debug, thiserror::Error)]
 pub enum InstallerError {
@@ -18,6 +21,9 @@ pub enum InstallerError {
 
     #[error("bundled courses directory not found at {0}")]
     MissingResourceDirectory(PathBuf),
+
+    #[error("database error: {0}")]
+    DB(#[from] sea_orm::DbErr),
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -27,6 +33,14 @@ pub struct CourseStatus {
     pub resource_version: String,
     pub installed_version: String,
     pub needs_update: bool,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct ReconcileResult {
+    pub id: String,
+    pub title: String,
+    pub version: String,
+    pub changed: bool,
 }
 
 fn io_err(path: &Path, source: std::io::Error) -> InstallerError {
@@ -115,24 +129,27 @@ fn copy_dir_recursive(src: &Path, dst: &Path) -> Result<(), InstallerError> {
     Ok(())
 }
 
-pub fn ensure_all_installed(resource_dir: &Path, app_data_dir: &Path) -> Result<(), InstallerError> {
+pub async fn ensure_all_installed(
+    db: &DatabaseConnection,
+    resource_dir: &Path,
+    app_data_dir: &Path,
+) -> Result<Vec<ReconcileResult>, InstallerError> {
     let resource_root: PathBuf = resource_courses_dir(resource_dir);
 
     if !resource_root.is_dir() {
         return Err(InstallerError::MissingResourceDirectory(resource_root));
     }
 
+    let mut results = Vec::new();
+
     for course_dir in list_course_dirs(&resource_root)? {
         let course: Course = read_course_manifest(&course_dir)?;
-        let installed_dir = data_courses_dir(app_data_dir).join(&course.id);
+        let result = reconcile_course(db, resource_dir, app_data_dir, &course.id).await?;
 
-        if !installed_dir.join("manifest.toml").is_file() {
-            println!("Installing course '{}'...", course.id);
-            copy_dir_recursive(&course_dir, &installed_dir)?;
-        }
+        results.push(result);
     }
 
-    Ok(())
+    Ok(results)
 }
 
 pub fn install_course(resource_dir: &Path, app_data_dir: &Path, course_id: &str) -> Result<Course, InstallerError> {
@@ -147,6 +164,78 @@ pub fn install_course(resource_dir: &Path, app_data_dir: &Path, course_id: &str)
     copy_dir_recursive(&src, &dst)?;
 
     read_course_manifest(&dst)
+}
+
+pub async fn reconcile_course(
+    db: &DatabaseConnection,
+    resource_dir: &Path,
+    app_data_dir: &Path,
+    course_id: &str,
+) -> Result<ReconcileResult, InstallerError> {
+    let bundled = read_course_manifest(&resource_courses_dir(resource_dir).join(course_id))?;
+
+    let installed_dir = data_courses_dir(app_data_dir).join(course_id);
+    let folder_present = installed_dir.join("manifest.toml").is_file();
+
+    let previous_record = CourseEntity::find_by_id(course_id.to_string()).one(db).await?;
+    let needs_reconcile = !folder_present;
+
+    if !needs_reconcile {
+        return Ok(ReconcileResult {
+            id: bundled.id,
+            title: bundled.title,
+            version: bundled.version,
+            changed: false,
+        });
+    }
+
+    // TODO: Make code re-usable, it's same as `commands::update_course`.
+    let previous_version = previous_record.as_ref().map(|record| record.version.clone());
+
+    let migrations = read_course_migrations(&resource_courses_dir(resource_dir).join(course_id))?;
+
+    let course = install_course(resource_dir, app_data_dir, course_id)?;
+
+    // Migrate course.
+    if let Some(old_version) = previous_version {
+        let new_lesson_ids: Vec<String> = course.lessons.iter().map(|lesson| lesson.id.clone()).collect();
+        let migration = migrations
+            .as_ref()
+            .and_then(|migration| migration.find_for_version(&old_version));
+
+        progress::migrate_course_progress(db, &course.id, migration, &new_lesson_ids).await?;
+    }
+
+    // Updating course status.
+    let now = Utc::now();
+
+    match previous_record {
+        Some(record) => {
+            let mut active: course::ActiveModel = record.into();
+            active.title = Set(course.title.clone());
+            active.version = Set(course.version.clone());
+            active.updated_at = Set(now);
+            active.update(db).await?;
+        }
+        None => {
+            let active = course::ActiveModel {
+                id: Set(course.id.clone()),
+                title: Set(course.title.clone()),
+                version: Set(course.version.clone()),
+                installed_at: Set(now),
+                updated_at: Set(now),
+            };
+
+            active.insert(db).await?;
+        }
+    }
+
+    Ok(ReconcileResult {
+        id: course.id,
+        title: course.title,
+        version: course.version,
+        changed: true,
+    })
 }
 
 pub fn list_bundled_courses(resource_dir: &Path) -> Result<Vec<Course>, InstallerError> {

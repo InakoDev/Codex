@@ -54,14 +54,27 @@ pub fn run() {
                 .resource_dir()
                 .map_err(|err| format!("failed to resolve resource dir: {err}"))?;
 
-            if let Err(err) = installer::ensure_all_installed(&resource_dir, &app_data_dir) {
-                eprintln!("warning: failed to pre-install bundled courses: {err}")
+            let db_state = app.state::<AppState>();
+
+            match tauri::async_runtime::block_on(installer::ensure_all_installed(&db_state.db, &resource_dir, &app_data_dir)) {
+                Ok(results) => {
+                    for result in results.iter().filter(|r| r.changed) {
+                        eprintln!("reconciled course '{}' -> version {}", result.id, result.version)
+                    }
+                }
+
+                Err(err) => {
+                    eprintln!("warning: failed to reconcile bundled courses: {err}")
+                }
             }
 
             Ok(())
         })
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![])
+        .invoke_handler(tauri::generate_handler![
+            commands::check_courses,
+            commands::update_course
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
