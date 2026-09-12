@@ -1,10 +1,11 @@
+mod commands;
 mod db;
 mod installer;
 mod manifest;
-mod commands;
+mod migrations;
 
-use tauri::{Manager, WebviewWindow};
 use crate::commands::AppState;
+use tauri::{Manager, WebviewWindow};
 
 pub fn run() {
     // Tauri doesn't support Wayland properly due to problems upstream, this will allow it to run on Wayland.
