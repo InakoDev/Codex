@@ -70,7 +70,7 @@ pub fn read_course_migrations(course_dir: &Path) -> Result<Option<CourseMigratio
     let migrations: CourseMigrations = toml::from_str(&raw).map_err(|source| {
         InstallerError::Course(CourseError::TOML {
             path: migrations_path.clone(),
-            source
+            source,
         })
     })?;
 
@@ -101,9 +101,7 @@ fn copy_dir_recursive(src: &Path, dst: &Path) -> Result<(), InstallerError> {
 
     for entry in std::fs::read_dir(src).map_err(|err| io_err(src, err))? {
         let entry = entry.map_err(|err| io_err(src, err))?;
-        let file_type = entry
-            .file_type()
-            .map_err(|err| io_err(&entry.path(), err))?;
+        let file_type = entry.file_type().map_err(|err| io_err(&entry.path(), err))?;
         let src_path = entry.path();
         let dst_path = dst.join(entry.file_name());
 
@@ -117,10 +115,7 @@ fn copy_dir_recursive(src: &Path, dst: &Path) -> Result<(), InstallerError> {
     Ok(())
 }
 
-pub fn ensure_all_installed(
-    resource_dir: &Path,
-    app_data_dir: &Path,
-) -> Result<(), InstallerError> {
+pub fn ensure_all_installed(resource_dir: &Path, app_data_dir: &Path) -> Result<(), InstallerError> {
     let resource_root: PathBuf = resource_courses_dir(resource_dir);
 
     if !resource_root.is_dir() {
@@ -140,11 +135,7 @@ pub fn ensure_all_installed(
     Ok(())
 }
 
-pub fn install_course(
-    resource_dir: &Path,
-    app_data_dir: &Path,
-    course_id: &str,
-) -> Result<Course, InstallerError> {
+pub fn install_course(resource_dir: &Path, app_data_dir: &Path, course_id: &str) -> Result<Course, InstallerError> {
     let src: PathBuf = resource_courses_dir(resource_dir).join(course_id);
 
     if !src.is_dir() {

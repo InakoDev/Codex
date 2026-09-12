@@ -11,12 +11,7 @@ impl MigrationTrait for Migration {
                 Table::create()
                     .table(Courses::Table)
                     .if_not_exists()
-                    .col(
-                        ColumnDef::new(Courses::Id)
-                            .string()
-                            .not_null()
-                            .primary_key(),
-                    )
+                    .col(ColumnDef::new(Courses::Id).string().not_null().primary_key())
                     .col(ColumnDef::new(Courses::Title).string().not_null())
                     .col(ColumnDef::new(Courses::Version).string().not_null())
                     .col(ColumnDef::new(Courses::InstalledAt).timestamp().not_null())
@@ -27,9 +22,7 @@ impl MigrationTrait for Migration {
     }
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
-        manager
-            .drop_table(Table::drop().table(Courses::Table).to_owned())
-            .await
+        manager.drop_table(Table::drop().table(Courses::Table).to_owned()).await
     }
 }
 

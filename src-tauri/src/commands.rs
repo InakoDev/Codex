@@ -37,17 +37,14 @@ pub async fn update_course(
         .await
         .map_err(|err| err.to_string())?;
 
-    let previous_version: Option<String> = previous_record
-        .as_ref()
-        .map(|record| record.version.clone());
+    let previous_version: Option<String> = previous_record.as_ref().map(|record| record.version.clone());
 
-    let migrations = installer::read_course_migrations(
-        &installer::resource_courses_dir(&resource_dir).join(&course_id),
-    )
-    .map_err(|err| err.to_string())?;
+    let migrations =
+        installer::read_course_migrations(&installer::resource_courses_dir(&resource_dir).join(&course_id))
+            .map_err(|err| err.to_string())?;
 
-    let course: Course = installer::install_course(&resource_dir, &data_dir, &course_id)
-        .map_err(|err| err.to_string())?;
+    let course: Course =
+        installer::install_course(&resource_dir, &data_dir, &course_id).map_err(|err| err.to_string())?;
 
     // TODO: Migrate old course progress tracking to match new course.
     //     // Migrating course progress
@@ -65,10 +62,7 @@ pub async fn update_course(
             active.title = Set(course.title.clone());
             active.version = Set(course.version.clone());
             active.updated_at = Set(now);
-            active
-                .update(&state.db)
-                .await
-                .map_err(|err| err.to_string())?;
+            active.update(&state.db).await.map_err(|err| err.to_string())?;
         }
         None => {
             let active = course::ActiveModel {

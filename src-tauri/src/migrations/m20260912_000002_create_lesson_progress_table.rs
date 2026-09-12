@@ -17,11 +17,7 @@ impl MigrationTrait for Migration {
                     .if_not_exists()
                     .col(ColumnDef::new(LessonProgress::CourseId).string().not_null())
                     .col(ColumnDef::new(LessonProgress::LessonId).string().not_null())
-                    .col(
-                        ColumnDef::new(LessonProgress::CompletedAt)
-                            .timestamp()
-                            .not_null(),
-                    )
+                    .col(ColumnDef::new(LessonProgress::CompletedAt).timestamp().not_null())
                     .primary_key(
                         Index::create()
                             .col(LessonProgress::CourseId)

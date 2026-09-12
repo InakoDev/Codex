@@ -1,6 +1,6 @@
+use serde::Deserialize;
 use std::collections::HashMap;
 use std::path::PathBuf;
-use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 pub struct Course {
@@ -34,7 +34,7 @@ pub struct VersionMigration {
     pub from_version: String,
 
     #[serde(default, rename = "lessons")]
-    pub lesson_id_map: HashMap<String, String>
+    pub lesson_id_map: HashMap<String, String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -78,7 +78,7 @@ pub enum Panel {
 
         #[serde(default = "default_true")]
         required: bool,
-    }
+    },
 }
 
 impl Panel {
