@@ -149,6 +149,24 @@ pub fn install_course(resource_dir: &Path, app_data_dir: &Path, course_id: &str)
     read_course_manifest(&dst)
 }
 
+pub fn list_bundled_courses(resource_dir: &Path) -> Result<Vec<Course>, InstallerError> {
+    let resource_root: PathBuf = resource_courses_dir(resource_dir);
+
+    list_course_dirs(&resource_root)?
+        .iter()
+        .map(|dir| read_course_manifest(dir))
+        .collect()
+}
+
+pub fn list_installed_courses(app_data_dir: &Path) -> Result<Vec<Course>, InstallerError> {
+    let data_root: PathBuf = data_courses_dir(app_data_dir);
+
+    list_course_dirs(&data_root)?
+        .iter()
+        .map(|dir| read_course_manifest(dir))
+        .collect()
+}
+
 pub fn resource_courses_dir(resource_dir: &Path) -> PathBuf {
     resource_dir.join("courses")
 }

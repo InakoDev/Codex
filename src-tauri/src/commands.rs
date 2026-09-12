@@ -90,3 +90,63 @@ pub async fn update_course(
         needs_update: false,
     })
 }
+
+#[tauri::command]
+pub async fn check_courses(app: AppHandle, state: State<'_, AppState>) -> Result<Vec<CourseStatus>, String> {
+    let resource_dir: PathBuf = resource_dir(&app)?;
+    let data_dir: PathBuf = app_data_dir(&app)?;
+
+    let bundled = installer::list_bundled_courses(&resource_dir).map_err(|err| err.to_string())?;
+
+    let mut statuses = Vec::with_capacity(bundled.len());
+
+    for course in bundled {
+        let existing = CourseEntity::find_by_id(course.id.clone())
+            .one(&state.db)
+            .await
+            .map_err(|err| err.to_string())?;
+
+        match existing {
+            Some(record) => {
+                let needs_update = is_newer(&course.version, &record.version);
+                statuses.push(CourseStatus {
+                    id: course.id,
+                    title: course.title,
+                    resource_version: course.version,
+                    installed_version: record.version,
+                    needs_update
+                })
+            }
+
+            None => {
+                println!("Course {} not found", course.id);
+                // TODO: Check whether this is a possible state to get into.
+                //  If it is then, I guess install the course and add to db.
+            }
+        }
+    }
+
+    Ok(statuses)
+}
+
+fn is_newer(resource_version: &str, installed_version: &str) -> bool {
+    let parse = |version: &str| -> Vec<u64> {
+        version.split('.')
+            .map(|segment| segment.parse::<u64>().unwrap_or(0))
+            .collect()
+    };
+
+    let resource_parts = parse(resource_version);
+    let installed_parts = parse(installed_version);
+
+    for i in 0..resource_parts.len().max(installed_parts.len()) {
+        let r = resource_parts.get(i).copied().unwrap_or(0);
+        let inst = installed_parts.get(i).copied().unwrap_or(0);
+
+        if r != inst {
+            return r > inst;
+        }
+    }
+
+    false
+}
