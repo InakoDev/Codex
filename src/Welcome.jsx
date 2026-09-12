@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { ArrowIcon } from "./Icons.jsx";
+import { ArrowIcon } from "./components/Icons.jsx";
 
 const PROMPT_EXAMPLES = ["How does a neural network actually learn?", "Explain ownership and borrowing in Rust"];
 
-function WelcomeScreen({ onStart, onSkip }) {
+function Welcome({ onStart, onSkip }) {
     const [query, setQuery] = useState("");
 
     function handleSubmit(event) {
@@ -57,4 +57,4 @@ function WelcomeScreen({ onStart, onSkip }) {
     );
 }
 
-export default WelcomeScreen;
+export default Welcome;

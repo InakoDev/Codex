@@ -8,7 +8,7 @@ import "./styles/components/welcome.css";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useState } from "react";
 import Sidebar from "./components/Sidebar.jsx";
-import WelcomeScreen from "./components/WelcomeScreen.jsx";
+import Welcome from "./Welcome.jsx";
 import LessonsTab from "./tabs/LessonsTab.jsx";
 import ChatTab from "./tabs/ChatTab.jsx";
 import ProgressTab from "./tabs/ProgressTab.jsx";
@@ -59,7 +59,7 @@ function App() {
     if (!started) {
         return (
             <main className={"container" /*"container container-welcome"*/}>
-                <WelcomeScreen onStart={startJourney} onSkip={() => setStarted(true)} />
+                <Welcome onStart={startJourney} onSkip={() => setStarted(true)} />
             </main>
         );
     }
