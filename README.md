@@ -1,6 +1,6 @@
 # Codex
 
-**An interactive learning environment with LLM integration**
+**An interactive learning environment with LLM integration.**
 
 Start with a question, a curious thought, or something you've always wanted to understand. Codex will turn that into the
 beginning of a new learning journey.
