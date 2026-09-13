@@ -2,7 +2,6 @@ import "./styles/catppuccin.css";
 import "./styles/themes/dark.css";
 import "./styles/main.css";
 
-import "./styles/components/sidebar.css";
 import "./styles/components/welcome.css";
 
 import { getCurrentWindow } from "@tauri-apps/api/window";

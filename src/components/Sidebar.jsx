@@ -1,4 +1,5 @@
 import { BookIcon, ChatIcon, LessonsIcon, ProgressIcon, SettingsIcon } from "./Icons.jsx";
+import "../styles/components/sidebar.css";
 
 const NAVIGATION_ITEMS = [
     { id: "chat", label: "Chat", icon: ChatIcon },
